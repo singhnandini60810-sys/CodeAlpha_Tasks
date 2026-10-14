@@ -1,0 +1,159 @@
+Run started:2026-10-14 12:57:55.486155+00:00
+
+Test results:
+>> Issue: [B403:blacklist] Consider possible security implications associated with pickle module.
+   Severity: Low   Confidence: High
+   CWE: CWE-502 (https://cwe.mitre.org/data/definitions/502.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b403-import-pickle
+   Location: ./vulnerable_app.py:8:0
+7	import os
+8	import pickle
+9	import random
+
+--------------------------------------------------
+>> Issue: [B404:blacklist] Consider possible security implications associated with the subprocess module.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess
+   Location: ./vulnerable_app.py:11:0
+10	import sqlite3
+11	import subprocess
+12	
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'supersecret123'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html
+   Location: ./vulnerable_app.py:16:17
+15	app = Flask(__name__)
+16	app.secret_key = "supersecret123"          # hard-coded secret
+17	ADMIN_PASSWORD = "admin@123"               # hard-coded credential
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'admin@123'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html
+   Location: ./vulnerable_app.py:17:17
+16	app.secret_key = "supersecret123"          # hard-coded secret
+17	ADMIN_PASSWORD = "admin@123"               # hard-coded credential
+18	DB = "notes.db"
+
+--------------------------------------------------
+>> Issue: [B324:hashlib] Use of weak MD5 hash for security. Consider usedforsecurity=False
+   Severity: High   Confidence: High
+   CWE: CWE-327 (https://cwe.mitre.org/data/definitions/327.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b324_hashlib.html
+   Location: ./vulnerable_app.py:36:8
+35	    u, p = request.form["username"], request.form["password"]
+36	    h = hashlib.md5(p.encode()).hexdigest()                       # weak hash, no salt
+37	    con = db()
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./vulnerable_app.py:38:16
+37	    con = db()
+38	    con.execute("INSERT INTO users(username,password) VALUES('%s','%s')" % (u, h))   # SQLi
+39	    con.commit()
+
+--------------------------------------------------
+>> Issue: [B324:hashlib] Use of weak MD5 hash for security. Consider usedforsecurity=False
+   Severity: High   Confidence: High
+   CWE: CWE-327 (https://cwe.mitre.org/data/definitions/327.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b324_hashlib.html
+   Location: ./vulnerable_app.py:46:8
+45	    u, p = request.form["username"], request.form["password"]
+46	    h = hashlib.md5(p.encode()).hexdigest()
+47	    q = f"SELECT id FROM users WHERE username='{u}' AND password='{h}'"            # SQLi
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./vulnerable_app.py:47:10
+46	    h = hashlib.md5(p.encode()).hexdigest()
+47	    q = f"SELECT id FROM users WHERE username='{u}' AND password='{h}'"            # SQLi
+48	    row = db().execute(q).fetchone()
+
+--------------------------------------------------
+>> Issue: [B301:blacklist] Pickle and modules that wrap it can be unsafe when used to deserialize untrusted data, possible security issue.
+   Severity: Medium   Confidence: High
+   CWE: CWE-502 (https://cwe.mitre.org/data/definitions/502.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b301-pickle
+   Location: ./vulnerable_app.py:59:11
+58	def profile():
+59	    data = pickle.loads(base64.b64decode(request.cookies.get("session", "")))      # insecure deserialization
+60	    return "Hello " + data["user"]
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./vulnerable_app.py:66:24
+65	    q = request.args.get("q", "")
+66	    rows = db().execute("SELECT body FROM notes WHERE body LIKE '%" + q + "%'").fetchall()   # SQLi
+67	    return render_template_string("<h1>Results for " + q + "</h1>" + str(rows))               # XSS / SSTI
+
+--------------------------------------------------
+>> Issue: [B602:subprocess_popen_with_shell_equals_true] subprocess call with shell=True identified, security issue.
+   Severity: High   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b602_subprocess_popen_with_shell_equals_true.html
+   Location: ./vulnerable_app.py:87:11
+86	    host = request.args.get("host", "127.0.0.1")
+87	    return subprocess.check_output("ping -c 1 " + host, shell=True)               # command injection
+88	
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: ./vulnerable_app.py:98:15
+97	def reset():
+98	    return str(random.randint(1000, 9999))                                         # predictable 4-digit token
+99	
+
+--------------------------------------------------
+>> Issue: [B201:flask_debug_true] A Flask app appears to be run with debug=True, which exposes the Werkzeug debugger and allows the execution of arbitrary code.
+   Severity: High   Confidence: Medium
+   CWE: CWE-94 (https://cwe.mitre.org/data/definitions/94.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b201_flask_debug_true.html
+   Location: ./vulnerable_app.py:103:4
+102	    init_db()
+103	    app.run(host="0.0.0.0", debug=True)                                            # Werkzeug debugger exposed
+
+--------------------------------------------------
+>> Issue: [B104:hardcoded_bind_all_interfaces] Possible binding to all interfaces.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-605 (https://cwe.mitre.org/data/definitions/605.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b104_hardcoded_bind_all_interfaces.html
+   Location: ./vulnerable_app.py:103:17
+102	    init_db()
+103	    app.run(host="0.0.0.0", debug=True)                                            # Werkzeug debugger exposed
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 77
+	Total lines skipped (#nosec): 0
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 5
+		Medium: 5
+		High: 4
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 1
+		Medium: 6
+		High: 7
+Files skipped (0):
